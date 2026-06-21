@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFHS Atlas — India District Health Explorer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23123A5E'/%3E%3Cpath d='M4 12V4h1.6l4.8 5.2V4H12v8h-1.6L5.6 6.8V12z' fill='%2316A6BE'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <h1>NFHS Atlas</h1>
+    <span class="tag">NFHS-4 · 5 · 6</span>
+    <span class="sub">District · State · National health-indicator explorer for India</span>
+  </div>
+  <div class="meta">
+    <div><b id="stat-d">—</b> districts · <b id="stat-s">—</b> states/UTs · <b id="stat-i">—</b> indicators</div>
+    <div>NFHS-4 (2015–16) · NFHS-5 (2019–21) · NFHS-6 (2023–24)</div>
+  </div>
+</header>
+
+<div class="cmdbar">
+  <div class="field">
+    <label>Geography level</label>
+    <div class="seg" id="level-seg">
+      <button data-v="district">Districts</button>
+      <button data-v="state">States / UTs</button>
+    </div>
+  </div>
+  <div class="field" style="flex:1;min-width:280px">
+    <label>Indicator</label>
+    <select id="ind-select" class="ind-select"></select>
+  </div>
+  <div class="field">
+    <label>Survey / view</label>
+    <div class="seg seg-wrap" id="round-seg">
+      <button data-v="v6">NFHS-6</button>
+      <button data-v="v5">NFHS-5</button>
+      <button data-v="v4">NFHS-4</button>
+      <button data-v="change">Δ&nbsp;4→5</button>
+      <button data-v="change56">Δ&nbsp;5→6</button>
+      <button data-v="change46">Δ&nbsp;4→6</button>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="field export-bar">
+    <label>Export current tab</label>
+    <div style="display:flex;gap:8px">
+      <button class="btn-x" id="exp-pptx"><span class="bx-i">▦</span> PowerPoint</button>
+      <button class="btn-x" id="exp-xlsx"><span class="bx-i">▤</span> Excel</button>
+    </div>
+  </div>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button data-tab="atlas" role="tab"><span class="num">01</span>Atlas map</button>
+  <button data-tab="compare" role="tab"><span class="num">02</span>Compare</button>
+  <button data-tab="change" role="tab"><span class="num">03</span>Change &amp; rankings</button>
+  <button data-tab="profile" role="tab"><span class="num">04</span>Profile</button>
+</nav>
+
+<main>
+  <!-- ATLAS -->
+  <section id="view-atlas" class="view">
+    <div id="atlas-insights"></div>
+    <div class="atlas">
+      <div class="panel map-wrap">
+        <div class="panel-h">
+          <div><h2 id="atlas-ind" style="font-family:var(--font-ui);font-size:14px;font-weight:600"></h2></div>
+          <div class="ph-right"><span class="hint" id="atlas-scope"></span><button class="btn-reset" id="atlas-reset" title="Reset map to the all-India default view"><span class="ri">↺</span>Reset</button></div>
+        </div>
+        <button class="map-back" id="map-back"><span>← All of India</span></button>
+        <div id="mapbox" class="mapbox"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="panel rank-panel">
+        <div class="panel-h"><h2>Rankings</h2><span class="hint">click to drill in</span></div>
+        <div class="rank-scroll" id="rank-scroll"></div>
+      </div>
+    </div>
+    <p class="note" id="v6-note" style="margin-top:14px;display:none;background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;padding:9px 12px;color:var(--accent)"><b>NFHS-6 view.</b> NFHS-6 was released only at <b>state / UT &amp; national</b> level (no districts), so the map is locked to States/UTs. Manipur was not surveyed in 2023–24 and shows as no-data. Δ&nbsp;5→6 uses official IIPS figures for both rounds; Δ&nbsp;4→6 compares official NFHS-6 against the dataset's NFHS-4 district mean (mixed basis).</p>
+    <p class="note" style="margin-top:14px">NFHS-4/5 state &amp; national figures are <b>unweighted means of district values</b> (not the official population-weighted factsheet estimates). NFHS-6 figures <b>are</b> the official IIPS state/UT/national factsheet estimates. Colour shows performance relative to the national figure, oriented by each indicator's direction (e.g. lower anaemia and higher immunisation both read as “better”). Ladakh shares 2011-census geometry with Jammu &amp; Kashmir.</p>
+  </section>
+
+  <!-- COMPARE -->
+  <section id="view-compare" class="view" style="display:none">
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-h"><h2>Side-by-side comparison</h2><div class="ph-right"><span class="hint">up to 4 geographies — any mix of district / state / national</span><button class="btn-reset" id="cmp-reset" title="Clear all and reset to India"><span class="ri">↺</span>Reset</button></div></div>
+      <div style="padding:14px 16px">
+        <div id="cmp-chips" class="cmp-pick" style="margin-bottom:12px"></div>
+        <div class="addbox">
+          <div class="field"><label>Add level</label>
+            <select id="cmp-add-type"><option value="national">National</option><option value="state">State / UT</option><option value="district">District</option></select></div>
+          <div class="field"><label>Name</label><select id="cmp-add-name"></select></div>
+          <button id="cmp-add-btn" class="seg" style="padding:7px 16px;background:var(--accent);color:#fff;border:0;border-radius:6px;font-weight:600">+ Add</button>
+        </div>
+      </div>
+    </div>
+    <div id="cmp-insights"></div>
+    <div class="panel" id="cmp-focus" style="margin-bottom:16px"></div>
+    <div class="panel">
+      <div class="panel-h"><h2>Indicator comparison table</h2>
+        <span class="field" style="flex-direction:row;align-items:center;gap:8px"><label style="margin:0">Category</label><select id="cmp-cat"></select></span></div>
+      <div style="overflow:auto;max-height:62vh" id="cmp-table-wrap"></div>
+    </div>
+  </section>
+
+  <!-- CHANGE -->
+  <section id="view-change" class="view" style="display:none">
+    <div class="panel-h" style="border:0;padding:0 2px 12px">
+      <div><div class="eyebrow">NFHS-4 → NFHS-5 movement</div>
+        <h2 id="chg-title" style="font-family:var(--font-ui);font-size:15px;font-weight:600;margin-top:3px"></h2></div>
+      <span class="hint" id="chg-scope"></span>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin:-6px 2px 8px"><button class="btn-reset" id="chg-reset" title="Reset to the all-India default view"><span class="ri">↺</span>Reset view</button></div>
+    <div id="chg-insights"></div>
+    <div class="kpi-strip" id="chg-kpi"></div>
+    <div class="chg-grid">
+      <div class="panel"><div class="panel-h"><h2>Biggest improvements</h2><span class="hint">click to open profile</span></div>
+        <div style="padding:8px 10px 12px" id="chg-up"></div></div>
+      <div class="panel"><div class="panel-h"><h2>Biggest declines</h2><span class="hint">click to open profile</span></div>
+        <div style="padding:8px 10px 12px" id="chg-down"></div></div>
+    </div>
+    <div class="viz-legend box" id="chg-legend" style="margin-top:14px"></div>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="view-profile" class="view" style="display:none">
+    <div class="panel" style="margin-bottom:16px"><div style="padding:14px 16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      <div class="prof-head" id="prof-head" style="flex:1;margin:0"></div>
+      <div class="addbox" style="margin-left:auto">
+        <div class="field"><label>View profile for</label>
+          <select id="prof-type"><option value="national">National (India)</option><option value="state">State / UT</option><option value="district">District</option></select></div>
+        <div class="field"><label>&nbsp;</label><select id="prof-name"></select></div>
+        <div class="field"><label>&nbsp;</label><button class="btn-reset" id="prof-reset" title="Reset to National (India)"><span class="ri">↺</span>Reset</button></div>
+      </div>
+    </div></div>
+    <div id="prof-insights"></div>
+    <div class="viz-legend box" id="prof-legend" style="margin-bottom:14px"></div>
+    <div id="prof-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(440px,1fr));gap:16px;align-items:start"></div>
+    <p class="note" style="margin-top:12px">Clean columns show each round's value (NFHS-6 in teal where available; state/UT &amp; national NFHS-6/NFHS-5 are official IIPS figures, NFHS-4 is the dataset's district mean). <b>Δ latest</b> and the <b>Trend</b> arrow use 5→6 where NFHS-6 exists, otherwise 4→5 — <span class="trend up"><span class="ar"></span></span> improving, <span class="trend flat"><span class="ar"></span></span> stable (no change), <span class="trend down"><span class="ar"></span></span> worsening; grey ◆ marks neutral indicators. The mini-chart traces 2015→2024. Click any row to open that indicator on the map. Indicators tagged <b>6</b> are NFHS-6-only.</p>
+  </section>
+</main>
+
+<footer class="app-footer">
+  <div>For support, please reach out to the developer at <a href="mailto:mchaurasiya@wjcf.in">mchaurasiya@wjcf.in</a></div>
+  <div class="ft-r">NFHS Atlas · NFHS-4 · 5 · 6 · India</div>
+</footer>
+
+<div class="tip" id="tip"></div>
+<div class="toast" id="toast"></div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
