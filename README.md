@@ -1,6 +1,6 @@
 # NFHS Atlas
 
-[![View live dashboard](https://img.shields.io/badge/View%20live%20dashboard-2563eb?style=for-the-badge&logo=github&logoColor=white)]([https://zerobug-mohit.github.io/nfhs-atlas/](https://zerobug-mohit.github.io/NFHS-Atlas/))
+[![View live dashboard](https://img.shields.io/badge/View%20live%20dashboard-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://zerobug-mohit.github.io/NFHS-Atlas/)
 
 An offline-capable dashboard for exploring India's National Family Health Survey
 data (NFHS-4, NFHS-5 and NFHS-6) across 640 districts and 37 states/UTs and 131
